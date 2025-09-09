@@ -1,3 +1,3 @@
-# Messtechnik HS2024
+# Messtechnik HS2025
 
-Uebungsserie zur Vorlesung «Messtechnik» (HS2024)
+Uebungsserie zur Vorlesung «Messtechnik» (HS2025)
