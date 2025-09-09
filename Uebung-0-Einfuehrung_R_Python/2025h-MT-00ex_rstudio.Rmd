@@ -1,0 +1,370 @@
+---
+title: "Messtechnik — Übung 0"
+subtitle: "HS 2025"
+author: "urho"
+output:
+  bookdown::html_document2: 
+    toc: false
+    toc_depth: 3
+  bookdown::pdf_document2: 
+    latex_engine: pdflatex
+    keep_tex: false
+    toc: false
+    toc_depth: 3
+link-citations: no
+fontsize: 12pt
+always_allow_html: true
+header-includes:
+  - \usepackage[german]{babel}
+  - \usepackage[explicit]{titlesec}
+  - \renewcommand{\thesubsection}{\arabic{section}.\arabic{subsection}}
+  - \titleformat{\subsection}{\normalfont\bfseries}{}{0em}{\thesubsection\text{ }}
+  - \titleformat{\section}{\normalfont\Large\bfseries}{}{0em}{Aufgabe \thesection:\text{ }#1}
+---
+
+```{css css-format, echo=FALSE}
+.header-section-number { display: none; }
+body { counter-reset: counter-level-1; }
+h1:not(.title) {
+  counter-increment: counter-level-1;
+  counter-reset: counter-level-2;
+}
+h1:not(.title)::before{ content: "Aufgabe " counter(counter-level-1) ": "; }
+h2 {
+  counter-increment: counter-level-2;
+  counter-reset: counter-level-3;
+}
+h2::before { content: counter(counter-level-1) "." counter(counter-level-2) " "; }
+```
+
+```{cat abb-tab-eq, engine.opts = list(file = "_bookdown.yml")}
+language:
+  label:
+    fig: 'Abbildung '
+    tab: 'Tabelle '
+    eq: 'Gleichung '
+```
+
+```{r Initialisierung, include=FALSE, message=FALSE, warning=FALSE}
+rm(list=ls()) # Loeschen aller Variablen und Funktionen
+
+# Im Folgenden werden notwendige Pakete geladen:
+library("rmarkdown")
+library("bookdown")
+library("knitr")
+library("plotrix") # Um Achsen zu «brechen»
+
+```
+
+# Einführung in «R» für wissenschaftliche Zwecke
+
+## Einleitung
+
+Viele von Ihnen kamen mit «R» bereits in Kontakt — meist im Rahmen der Datenanalyse im Praktikum. Aus diesem Grunde haben wir uns entschlossen, die Übungen in «R» zu gestalten. Es steht Ihnen selbstverständlich frei auch andere Programmiersprachen zu verwenden, wenn Sie sich damit wohler fühlen. In diesen Fällen können wir aber nicht immer Hilfestellung leisten.
+
+### Warum «R»?
+
+Die Analyse wissenschaftlicher Daten ist (idealerweise) unabhängig von der Wahl der Programme, die Sie verwenden. Dennoch gibt es Programme, deren Verwendung für bestimmte Analysen sinnvoller sind als andere.
+
+Ein wichtiger Gesichtspunkt bei der Wahl der Programme mag sein:
+
+-   Ist das Programm für jedes Betriebssystem verfügbar?
+-   Benötigt das Programm eine spezielle Lizenz, welche es mir verunmöglicht die Skripte auch nach Verlassen der ETH noch zu nutzen?
+-   Gibt es nützliche Zusatzpakete?
+
+Vielfach sind Open-Source Software eine optimale Wahl. Nebst [«R»](https://www.r-project.org/) sei hier auch [«python»](https://www.python.org/) als Programmiersprache erwähnt, welche die obigen Voraussetzungen erfüllen. Für beide Sprachen existieren auch geeignete Programmierumgebungen.
+
+Viele von Ihnen haben im Falle von «R» die Programmieroberfläche [«rstudio»](https://www.rstudio.com/products/rstudio/) verwendet. Diese ist nicht unpraktisch und in einer Open-Source-Version erhältlich.
+
+Es sind auch mannigfaltige Handbücher und Tutorials im Internet verfügbar, z.B. unter <https://education.rstudio.com/>.
+
+### Was werden wir in dieser Übung lernen?
+
+In dieser Übung wollen wir «R» zur wissenschaftlichen Datenanalyse anwenden und die wichtigsten Befehle lernen, die wir für das Einlesen und die Speicherung von Daten, die Datenmanipulation und die Datenanalyse benötigen werden.
+
+## Wie soll man beginnen?
+
+Startet man mit einem Projekt ist es sinnvoll, alle vorgängigen Variablen und Funktionen zu löschen. Dies kann man mit dem Befehl `rm(list=ls())` erreichen.
+
+Kommentieren Sie Ihr Programm / Skript. Dies kann man sehr leicht mit dem Raute-Symbol `#` machen.
+
+## Variablen und Datentypen
+
+Beachten Sie, dass Klein-/Grossschreibung relevant ist. Sie können den Wert durch aufrufen des Variablennamens ausgeben.
+
+### Problem:
+
+Weisen Sie Ihre Grösse (in Metern) und Ihr Gewicht (in Kilogramm) Variablen zu und geben Sie diese aus.
+
+```{r}
+groesse = 1.79
+gewicht = 68.7
+groesse
+gewicht
+```
+
+## Mathematische Operationen
+
+Nebst den mathematischen Grundoperationen `+`, `-`, `*` und `/` gibt es noch weitere Operatoren:
+
+-   `^` oder `**` zum Potenzieren (z.B. `a^2` oder `a**2`, etc.)
+-   `%%` entspricht der Modulo-Division (`1.2 %% 1` ergibt das Resultat `0.2`)
+-   `%/%` entspricht der ganzzahligen Division (`1.2 %/% 1` ergibt das Resultat `1`)
+
+Wendet man diese Operatoren auf Vektoren oder Matrizen an, werden die Operatoren elementweise durchgeführt. Für Vektoren und Matrizen existieren u.a. die Matrixmultiplikation `%*%`.
+
+### Beispiel:
+
+Berechnen Sie Ihren BMI.
+
+-   Definition: $\mathrm{BMI} = \frac{\mathrm{gewicht}}{\mathrm{groesse}^2}$
+
+```{r}
+groesse = 1.79 # Groesse in Metern
+gewicht = 68.7 # Gewicht in Kilogramm
+bmi = gewicht / groesse**2
+print(bmi)
+```
+
+```{r}
+# Aenderung der Groesse oder des Gewichtes aendert den BMI nicht
+groesse = 1.34
+print(bmi)
+```
+
+## Funktionen
+
+Nebst vielen vordefinierten Funktionen (z.B. `cos`, `sin`, `exp`, `log`, `log10`, etc.) besteht auch die Möglichkeit, eigene Funktionen zu schreiben.
+
+*Hinweis*: Beachten Sie, dass in R die Funktionen `log` dem natürlichen Logarithmus «ln» und `log10` den dekadischen Logarithmus «lg» entsprechen.
+
+Als Beispiel soll hier die sinc-Funktion erstellt werden, die als $\mathrm{sinc}(x)=\frac{\sin(\pi x)}{\pi x}$ definiert ist.
+
+```{r}
+sinc = function (x) {
+  x[x==0]=NA
+  y = sin(pi*x)/(pi*x)
+  y[is.na(x)]=1;
+  return(y);
+}
+sinc(0.5);
+```
+
+## Daten Typen
+
+-   «double» - reelle Zahl (3.1415)
+-   «complex» - komplexe Zahl (2.1+0.1i)
+-   «integer» - ganzzahlige Zahl (3)
+-   «character» - Text
+-   «logical» - logischer Wert (TRUE, T, FALSE, F)
+
+```{r}
+typeof(bmi)
+x = "Body Mass Index"; typeof(x)
+y = 1.2+0.5i; typeof(y)
+z = TRUE; typeof(z)
+```
+
+## Listen und Vektoren
+
+Oftmals ist es zweckmässig mit Listen, Vektoren und Matrizen zu rechnen. Mit dem Befehl `c()` kann man Elemente zu Listen oder Vektoren kombinieren. Mit `n:m` wird eine Liste aus ganzzahligen Elementen erzeugt, die bei `n` beginnt und in Schritten von 1 und bei `m` endet. Benötigt man einen Vektor, den linear von `n` bis `m` geht, kann dieser mit dem Befehl `seq(from=n,to=m,by=stepsize)` oder `seq(from=n,to=m,length.out=1000)` generiert werden. Mit `rep(x,n)` kann eine Liste erzeugt werden, die `n`-mal das Element `x` enthält.
+
+```{r}
+a = c(1.2, 1.3, 2.4, 1.5); a;
+b = 2:13; b;
+c = seq(0,20,by=2); c;
+d = seq(0,20,length.out=10); d;
+e = rep(1.2,5); e;
+```
+
+Die einzelnen Elemente in einem Vektor können mit `e[i]` adressiert werden, hier also das `i`-te Element im Vektor `e`. Die Nummerierung der Elemente in einem Vektor beginnen bei 1.
+
+### Leere Elemente
+
+Benötigt man leere Elemente, kann dies mit `NA` erzeugt werden
+
+```{r}
+e[2] = NA; e;
+```
+
+## Logische Operatoren
+
+Eine logische Variable hat den Wert `T` (`TRUE`) oder `F` (`FALSE`). Diese Werte erhält man auch, wenn man Vergleiche (`<`, `>`, `<=`, `>=`, `==`, `!=`) anstellt:
+
+```{r}
+1 > 2
+```
+
+Man kann auch logische Werte miteinander verknüpfen:
+
+-   `&&` — logisches «AND»
+-   `||` — logisches «OR»
+-   xor(x,y) — logisches «XOR»
+-   `!` — logisches «NOT»
+
+Möchte man einer Variablem einen bedingten Wert zuordnen, bietet sich der Befehl `ifelse()` an:
+
+```{r}
+a = ifelse( 1<3, "richtig", "falsch"); a
+```
+
+Man kann auch mit dem Kommando `if()` Bedingungenprogrammieren:
+
+```{r}
+a = 1; b = 2;
+if( a > b ) {
+  print('a ist groesser als b.')
+} else {
+  print('a ist kleiner oder gleich b.')
+}
+```
+
+## Schleifen
+
+Zur Programmierung gibt es im wesentlichen zwei Arten Schlaufen. Entweder es wird ein vorgegebener Vektor «abgearbeitet» oder Anweisungen werden solange ausgeführt, solange eine bestimmte Bedingung erfüllt ist:
+
+```{r}
+a = 1:3
+for (i in a) {
+  print(i)
+}
+```
+
+```{r}
+i = 1
+while (i <= 3) {
+  print(i);
+  i=i+1
+}
+```
+
+## Matrizen
+
+Matrizen können unter anderem mit dem Befehl `matrix(data=NA, nrow=1, ncol=1, byrow=F, dimnames=NULL)`
+
+```{r}
+m1 = matrix(1:6, nrow=2, ncol=3); m1
+m2 = matrix(1:6, nrow=2, ncol=3, byrow=T); m2
+m3 = matrix(1:6, nrow=2, ncol=3, byrow=T, dimnames=list(c('R1','R2'),c('C1','C2','C3'))); m3
+```
+
+Wurden den Zeilen und Kolonnen keine Namen zugewiesen, können die Elemente mit `m1[2,3]` adressiert werden. Andernfalls können die Elemente mit `m3['R1','C2']` oder `m3[1,2]` aufgerufen werden.
+
+## Teilmatrizen
+
+Benötigt man nur einen Ausschnitt einer Matrix, kann man die auf verschiedene Arten adressieren:
+
+```{r}
+m1 = matrix(1:16, nrow=4, ncol=4, byrow=T); m1
+m2 = m1[2:3,3:4]; m2
+```
+
+## Manipulieren von Matrizen
+
+### Ändern von Elementen
+
+Man kann aber auch Elemente direkt ändern. Z.B. wollen wir in der Matrix `m3` alle Elemente auf den Wert -1 setzen, die in der ursprünglichen Matrix grösser waren als 6:
+
+```{r}
+m3 = m1; m3[ m3>6 ] = -1; m3
+```
+
+### Hinzufügen oder Löschen von Elementen (bzw. Kolonnen oder Zeilen)
+
+```{r}
+m4 = cbind( m1, c(1:4)); m4
+m5 = rbind( m1, c(1:4)); m5
+m6 = m5 [-c(1,3),]; m6
+```
+
+## Funktionen mit Matrizen (Vektoren) und Matrixoperationen
+
+### Funktionen
+
+Wie findet man den Maximalwert in einer Matrix? Wie rundet man Matrixelemente (und auch andere Skalare)?
+
+```{r}
+m1 = matrix( (1:16)**0.5, nrow=4, ncol=4, byrow=T ); m1
+m1max = max(m1); 
+m1max.ind = which.max(m1)
+m1max; 
+m1max.ind; 
+m2 = round(m1, digits=2); m2
+```
+
+### Matrixoperationen
+
+Die Transponierte einer Matrix:
+
+```{r}
+m3 = t(m2); m3
+```
+
+Bei der Multiplikation ist Vorsicht geboten: der Operator `*` führt lediglich eine elementweise Multiplikation durch während der Operator `%*%` eine Matrixmultiplikation durchführt:
+
+```{r}
+m1 = matrix( (1:9), nrow=3, ncol=3, byrow=T ); m1
+m2 = matrix( (1:9), nrow=3, ncol=3, byrow=T ); m2
+m3 = m1 * m2; m3
+m4 = m1 %*% m2; m4
+```
+
+Möchte man die Eigenwerte und Eigenvektoren bestimmen, liesse sich dies wie folgt bewerkstelligen:
+
+```{r}
+eigen(m4)
+```
+
+## Pakete
+
+In R gibt es mannigfaltige Zusatzpakete, die genutzt werden können. Man sollte sich aber immer die Frage stellen, ob man fremden Paketen vertraut. Es ist sicher nicht unsinnvoll, diese zuvor zu testen.
+
+### Laden von Paketen
+
+Ein Paket mit dem Namen «Dummy» kann man mit dem Befehl `library(dummy)` laden.
+
+### Installation von Paketen
+
+Existiert das Paket «Dummy» noch nicht auf dem lokalen Rechner, kann dieses mit `install.packages("dummy")` installiert werden.
+
+## Graphische Darstellung von Daten
+
+### Statische Darstellung von Daten
+
+Meist benutzt man die im Basis-Paket von R enthaltene `plot`-Funktion für die Darstellung von Daten:
+
+```{r}
+x=seq(-5,5,by=0.01)
+y=sinc(x)
+
+par( new=F, omd=c(0,1,0,1), mai=c(0.80,0.90,0,0)+0.1, xaxs='r', yaxs='r', las=1 )
+
+plot( x, y, type='l', lty=1, lwd=2, col='red', 
+      xlim=c(-3.5,3.5), ylim=c(-0.3,1.1),
+      xlab='', ylab='', axes=F, frame.plot=T, main='' )
+abline(v=0, h=0)
+abline(h=1, lty=2, col='blue', lwd=2)
+axis( side=1 )
+mtext( side=1, adj=1, cex=1, bquote(italic(x)), line=2 )
+axis( side=2, at=c(0,1), lab=c(0,'A') )
+mtext( side=2, adj=1, cex=1, bquote('sinc('~italic(x)~')'), line=1 )
+```
+
+### Interactive Darstellung von Daten
+
+Das Paket `plotly` bietet die Möglichkeit, die Daten interaktiv darzustellen, sodass man in die Graphiken reinzoomen kann:
+
+```{r}
+if(knitr::pandoc_to()=='html') {
+library(plotly, quietly=T, warn.conflicts=F)
+
+x=seq(-5,5,by=0.01)
+y=sinc(x)
+df=data.frame(x,y)
+
+fig <- plot_ly(df, x = ~x, y = ~y, type = 'scatter', mode = 'lines')
+fig
+}
+```
+
+*Hinweis*: Die interaktive Darstellung funktioniert nicht in LaTeX oder Word!
